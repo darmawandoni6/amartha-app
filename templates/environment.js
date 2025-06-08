@@ -1,0 +1,19 @@
+const templateCodeEnvironmentVariable = environment => {
+  return `
+  # If needed, add NEXT_PUBLIC_ prefix to make it accessible to client
+
+  NEXT_PUBLIC_MODE=${environment}
+  
+  NEXT_PUBLIC_BASE_URL=
+  NEXT_PUBLIC_API_URL=
+  
+  NEXT_PUBLIC_UNLEASH_URL=
+  NEXT_PUBLIC_UNLEASH_CLIENT_KEY=
+  NEXT_PUBLIC_UNLEASH_REFRESH_INTERVAL=
+  NEXT_PUBLIC_UNLEASH_APP_NAME=
+  NEXT_PUBLIC_UNLEASH_ENVIRONMENT=
+  
+  `;
+};
+
+export default templateCodeEnvironmentVariable;

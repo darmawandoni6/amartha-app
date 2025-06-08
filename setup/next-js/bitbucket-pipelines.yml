@@ -1,0 +1,215 @@
+image: node:20.18.0-bullseye
+
+options:
+  docker: true
+  size: 2x
+
+definitions:
+  caches:
+    node: node_modules
+
+  steps:
+    - step: &unit-test
+        name: Unit Test
+        caches:
+          - node
+        script:
+          - yarn install --frozen-lockfile
+          - yarn type-check
+          - yarn lint
+          - yarn test
+
+    - step: &unit-test-coverage
+        name: Unit Test
+        caches:
+          - node
+        script:
+          - yarn install --frozen-lockfile
+          - yarn type-check
+          - yarn lint
+          - yarn test-coverage
+        artifacts:
+          - coverage/**
+
+    - step: &semantic-release-validate
+        name: Validate Semantic Release Version
+        caches:
+          - node
+        script:
+          - yarn install --frozen-lockfile
+          - npx semantic-release --dry-run
+
+    - step: &semantic-release-generate
+        name: Generate Semantic Release Version
+        caches:
+          - node
+        script:
+          - yarn install --frozen-lockfile
+          - npx semantic-release
+        artifacts:
+          - semantic_version.txt
+          - package.json
+
+    - step: &deployment-to-gke
+        name: Deployment to gke
+        image:
+          name: asia.gcr.io/amartha-dev/amartha/deployer:v4.3.0
+          username: _json_key
+          password: '$GCR_DEV_JSON_KEY'
+        caches:
+          - docker
+        size: 2x
+        script:
+          - export PROJECT_ID=$GCP_PROJECT_ID
+          - export ZONE=$GCP_ZONE
+          - export CLUSTER_NAME=$GKE_CLUSTER_NAME
+          - export VERSION_NUMBER=$(git rev-parse --short HEAD)
+          - bash /ci/scripts/main.sh auth-gcr
+          - bash /ci/scripts/main.sh build
+          - bash /ci/scripts/main.sh auth-gke
+          - bash /ci/scripts/main.sh deploy
+
+    - step: &development-version-generate
+        name: Generate Development Version
+        caches:
+          - node
+        script:
+          - yarn install --frozen-lockfile
+          - yarn generate-dev-version
+        artifacts:
+          - package.json
+          - yarn.lock
+
+pipelines:
+  custom:
+    # NOTE: temporary, will be removed after production stable release
+    deployment-to-gke-dev:
+      - stage:
+          name: Build & Deploy App to DEV
+          steps:
+            - step:
+                name: Build App
+                caches:
+                  - node
+                script:
+                  - rm -rf .next
+                  - yarn install --frozen-lockfile
+                  - yarn build-dev
+                artifacts:
+                  - .next/**
+            - step:
+                <<: *deployment-to-gke
+                deployment: DEV
+                runs-on:
+                  - gke.amartha.dev
+    deployment-to-gke-uat:
+      - stage:
+          name: Build & Deploy App to UAT
+          steps:
+            - step:
+                name: Build App
+                caches:
+                  - node
+                script:
+                  - rm -rf .next
+                  - yarn install --frozen-lockfile
+                  - yarn build-uat
+                artifacts:
+                  - .next/**
+            - step:
+                <<: *deployment-to-gke
+                deployment: UAT
+                runs-on:
+                  - gke.amartha.uat
+  pull-requests:
+    '**':
+      - step: *unit-test
+
+  branches:
+    main:
+      - step: *unit-test-coverage
+      - step: *development-version-generate
+      - stage:
+          name: Build & Deploy App to DEV
+          steps:
+            - step:
+                name: Build App
+                caches:
+                  - node
+                script:
+                  - rm -rf .next
+                  - yarn install --frozen-lockfile
+                  - yarn build-dev
+                artifacts:
+                  - .next/**
+            - step:
+                <<: *deployment-to-gke
+                deployment: DEV
+                runs-on:
+                  - gke.amartha.dev
+      - stage:
+          name: Build & Deploy App to UAT
+          trigger: manual
+          steps:
+            - step:
+                name: Build App
+                caches:
+                  - node
+                script:
+                  - rm -rf .next
+                  - yarn install --frozen-lockfile
+                  - yarn build-uat
+                artifacts:
+                  - .next/**
+            - step:
+                <<: *deployment-to-gke
+                deployment: UAT
+                runs-on:
+                  - gke.amartha.uat
+
+    release/*:
+      - step: *unit-test-coverage
+      - step: *semantic-release-validate
+      - stage:
+          name: Build & Deploy App to PROD
+          steps:
+            - step: *semantic-release-generate
+            - step:
+                name: Build App
+                caches:
+                  - node
+                script:
+                  - rm -rf .next
+                  - yarn install --frozen-lockfile
+                  - yarn build-prod
+                artifacts:
+                  - .next/**
+            - step:
+                <<: *deployment-to-gke
+                deployment: PROD
+                runs-on:
+                  - gke.amartha.prod
+
+    hotfix/*:
+      - step: *unit-test-coverage
+      - step: *semantic-release-validate
+      - stage:
+          name: Build & Deploy App to PROD
+          trigger: manual
+          steps:
+            - step: *semantic-release-generate
+            - step:
+                name: Build App
+                caches:
+                  - node
+                script:
+                  - rm -rf .next
+                  - yarn install --frozen-lockfile
+                  - yarn build-prod
+                artifacts:
+                  - .next/**
+            - step:
+                <<: *deployment-to-gke
+                deployment: PROD
+                runs-on:
+                  - gke.amartha.prod
