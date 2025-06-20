@@ -6,10 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cli",
+    "node",
+    "typescript",
+    "next-js"
+  ],
+  "author": "Doni Darmawan",
   "license": "ISC",
-  "description": "",
+  "description": "Amartha App is a Command Line Interface (CLI) tool designed to make it easier and faster to create project using Next.",
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^14.0.0",
