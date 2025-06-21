@@ -1,11 +1,12 @@
-import fs from 'fs';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-import { tsConfig } from '../constants/ts-config.js';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const setupTsConfig = async () => {
-  const tsConfigPath = 'tsconfig.json';
-
-  fs.writeFileSync(tsConfigPath, JSON.stringify(tsConfig, null, 2));
+  const src = path.join(__dirname, '../setup/next-js/tsconfig.json');
+  const dest = path.join(process.cwd(), 'tsconfig.json');
+  copyFile(src, dest);
 };
 
 export default setupTsConfig;

@@ -1,5 +1,0 @@
-export const preCommit = `if yarn pre-commit; then
-echo '🎉 No error found: committing this now.... ✨🚀🏄‍♂️🍻'
-else
-echo '🔨❌ Yoo, you have a problem in your code. Check linter or check your test coverage 🔨❌'
-exit 1`;

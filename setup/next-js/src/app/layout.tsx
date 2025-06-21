@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
-import DevVersionBadge from '@shared/components/dev-version-badge';
-
 const font = Inter({
   weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
@@ -20,10 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
-        <DevVersionBadge />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 import shell from 'shelljs';
-import { runCommandWithBuilder } from '../utils/runCommandWithBuilder.js';
+
+import { runCommandWithBuilder } from '../utils/run-command';
 
 const configureGit = async (projectName, repositoryUrl) => {
   await runCommandWithBuilder(() => {
