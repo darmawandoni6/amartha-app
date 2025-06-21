@@ -4,11 +4,11 @@ import inquirer from 'inquirer';
 import ora from 'ora';
 import shell from 'shelljs';
 
+import configureDirectories from '../scripts/directories.js';
+import configureEnvironment from '../scripts/environment.js';
+import configureHuskyAndCommitlint from '../scripts/husky-commit-lint.js';
+import { nextTS } from '../scripts/next-ts.js';
 import { runCommandWithBuilder } from '../utils/run-command.js';
-import configureDirectories from './directories.js';
-import configureEnvironment from './environment.js';
-import configureHuskyAndCommitlint from './husky-commit-lint.js';
-import { nextTS } from './next-ts.js';
 
 async function askProjectDetails(projectName) {
   try {
@@ -46,7 +46,7 @@ async function askProjectDetails(projectName) {
   }
 }
 
-export async function createProject(projectName) {
+export async function initProject(projectName) {
   if (fs.existsSync(projectName)) {
     process.stdout.write(chalk.red('✖ ERROR : Project already exists') + `\n`);
     process.exit(1);

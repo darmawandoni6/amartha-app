@@ -6,6 +6,8 @@ import { huskyAndCommitlint } from '../constants/husky-lint.js';
 import { copyFile } from '../utils/copy-file.js';
 import { runCommandWithBuilder } from '../utils/run-command.js';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const filesToCopy = [
   {
     src: path.join(__dirname, '../templates/husky/pre-commit'),
