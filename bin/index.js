@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 
 import { schematics } from '../constants/semantic.js';
+import { generateAction } from './generate.js';
 import { actionInfo } from './info.js';
 import { initProject } from './init-project.js';
 import { setupConfig } from './setup.js';
@@ -42,7 +43,10 @@ program
 program.command('setup').description('setup a new configuration').action(setupConfig);
 
 // generate based on schematic
-program.command('generate <schematic> <file-name>').description('Generate a new file based on a schematic');
+program
+  .command('make <schematic> <module> <file-name>')
+  .description('Generate a new file based on a schematic')
+  .action(generateAction);
 
 // version cli
 program.version(packageJson.version, '-v, --version', `Display the current version of ${packageJson.name}`);
