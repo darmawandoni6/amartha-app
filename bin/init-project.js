@@ -8,6 +8,7 @@ import configureDirectories from '../scripts/directories.js';
 import configureEnvironment from '../scripts/environment.js';
 import configureHuskyAndCommitlint from '../scripts/husky-commit-lint.js';
 import { nextTS } from '../scripts/next-ts.js';
+import centerText from '../utils/center-text.js';
 import { runCommandWithBuilder } from '../utils/run-command.js';
 
 async function askProjectDetails(projectName) {

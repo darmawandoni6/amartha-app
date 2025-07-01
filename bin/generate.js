@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import ora from 'ora';
 
 import { schematicName, schematics } from '../constants/semantic.js';
@@ -10,9 +11,9 @@ export const generateAction = async (schematic, module, fileName) => {
     if (!schematics[schematic]) {
       throw new Error(`missing schematic ${schematic}`);
     }
+    console.log(chalk.green('Installation in progress... ☕'));
     switch (schematic) {
       case schematicName.module:
-        spinner.text = 'In progress... ☕\n';
         spinner.start();
         await generateModule(module, fileName);
         break;
